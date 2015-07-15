@@ -29,114 +29,115 @@ public interface AeroFSAPI
     /**
      * Download the entire file content of a file in one go.
      *
-     * @param fileID            The file identifier for the file to download.
-     * @param stream            The content of the file will be written to this stream.
-     * @return                  The ETag associated with the file content.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier for the file to download.
+     * @param out           The content of the file will be written to this out.
+     * @return              The ETag associated with the file content.
+     * @throws Exception    If the operation failed.
      */
-    String getFileContent(String fileID, OutputStream stream)
-            throws AeroFSException;
+    String getFileContent(String fileID, OutputStream out)
+            throws Exception;
 
     /**
      * Upload the entire file content of a file in one go.
      *
-     * @param fileID            The file identifier of the file to overwrite.
-     * @param eTag              The ETag of the file to overwrite.
-     * @param stream            The new content for the file to overwrite.
-     * @return                  The ETag associated with the new file content.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to overwrite.
+     * @param eTag          The ETag of the file to overwrite.
+     * @param in            The new content for the file to overwrite.
+     * @return              The ETag associated with the new file content.
+     * @throws Exception    If the operation failed.
      */
-    String uploadFileContent(String fileID, String eTag, InputStream stream)
-            throws AeroFSException;
+    String uploadFileContent(String fileID, String eTag, InputStream in)
+            throws Exception;
 
     /**
      * Checks whether a particular ETag for a file matches the ETag of the same file on the
      * endpoint.
      *
-     * @param fileID            The file identifier of the file of interest.
-     * @param eTag              The ETag of the file of interest.
-     * @return {@code True}     if and only if the provided ETag matches the ETag on
-     *                          the endpoint for the file of interest.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file of interest.
+     * @param eTag          The ETag of the file of interest.
+     * @return {@code True} if and only if the provided ETag matches the ETag on
+     *                      the endpoint for the file of interest.
+     * @throws Exception    If the operation failed.
      */
     boolean isFileContentUpToDate(String fileID, String eTag)
-            throws AeroFSException;
+            throws Exception;
 
     /**
      * Retrieve the ETag of a file on the endpoint without downloading the content. This can be
      * used to download a file in chunks.
      *
-     * @param fileID            The file identifier of the file of interest.
-     * @return                  The ETag of the file of interest.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file of interest.
+     * @return              The ETag of the file of interest.
+     * @throws Exception    If the operation failed.
      */
     String getFileContentETag(String fileID)
-            throws AeroFSException;
+            throws Exception;
 
     /**
      * Download partial content of a file of interest. The range should be inclusive on both end.
      *
-     * @param fileID            The file identifier of the file to download.
-     * @param eTag              The ETag of the file to download.
-     * @param stream            The downloaded content of the file will be written to this stream.
-     * @param start             The start of the range to download.
-     * @param end               The end of the range to download.
-     * @return                  The number of bytes downloaded.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to download.
+     * @param eTag          The ETag of the file to download.
+     * @param out           The downloaded content of the file will be written to this stream.
+     * @param start         The start of the range to download.
+     * @param end           The end of the range to download.
+     * @return              The number of bytes downloaded.
+     * @throws Exception    If the operation failed.
      */
-    int getFileContentRange(String fileID, String eTag, OutputStream stream,
-                            int start, int end)
-            throws AeroFSException;
+    long getFileContentRange(String fileID, String eTag, OutputStream out,
+                             long start, long end)
+            throws Exception;
 
     /**
      * Initial a chunked upload.
      *
-     * @param fileID            The file identifier of the file to overwrite.
-     * @param eTag              The ETag of the file to overwrite.
-     * @return                  The Upload-ID of the chunked upload.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to overwrite.
+     * @param eTag          The ETag of the file to overwrite.
+     * @return              The Upload-ID of the chunked upload.
+     * @throws Exception    If the operation failed.
      */
     String startChunkedUpload(String fileID, String eTag)
-            throws AeroFSException;
+            throws Exception;
 
     /**
      * Upload a particular chunk of a file using chunked upload.
      *
-     * @param fileID            The file identifier of the file to overwrite.
-     * @param eTag              The ETag of the file to overwrite.
-     * @param uploadID          The Upload-ID to identify the chunked upload.
-     * @param data              A buffer storing the data to be uploaded.
-     * @param offset            An offset into the buffer to start uploading the content.
-     * @param length            The length of the content in the buffer to upload.
-     * @return                  The number of bytes successfully uploaded so far.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to overwrite.
+     * @param eTag          The ETag of the file to overwrite.
+     * @param uploadID      The Upload-ID to identify the chunked upload.
+     * @param start         The start of the content range of this chunk.
+     * @param end           The end of the content range of this chunk.
+     * @param in            The stream to read the content of this chunk from.
+     * @param chunkSize     The number of bytes to read from stream.
+     * @return              The number of bytes successfully uploaded for this Upload-ID.
+     * @throws Exception    If the operation failed.
      */
     long doChunkedUpload(String fileID, String eTag, String uploadID,
-                         byte[] data, int offset, int length)
-            throws AeroFSException;
+                         long start, long end, InputStream in, long chunkSize)
+            throws Exception;
 
     /**
      * Retrieve the progress of a chunked upload.
      *
-     * @param fileID            The file identifier of the file to overwrite.
-     * @param eTag              The ETag of the file to overwrite.
-     * @param uploadID          The Upload-ID to identify the chunked upload.
-     * @return                  The number of bytes successfully uploaded so far.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to overwrite.
+     * @param eTag          The ETag of the file to overwrite.
+     * @param uploadID      The Upload-ID to identify the chunked upload.
+     * @return              The number of bytes successfully uploaded so far.
+     * @throws Exception    If the operation failed.
      */
     long getChunkedUploadProgress(String fileID, String eTag, String uploadID)
-            throws AeroFSException;
+            throws Exception;
 
     /**
      * Finishes a chunked upload and commit the content change.
      *
-     * @param fileID            The file identifier of the file to overwrite.
-     * @param eTag              The ETag of the file to overwrite.
-     * @param uploadID          The Upload-ID to identify the chunked upload request.
-     * @param totalLength       The total length of the content.
-     * @return                  The ETag of the new file content.
-     * @throws AeroFSException  If the operation failed.
+     * @param fileID        The file identifier of the file to overwrite.
+     * @param eTag          The ETag of the file to overwrite.
+     * @param uploadID      The Upload-ID to identify the chunked upload request.
+     * @param totalLength   The total length of the content.
+     * @return              The ETag of the new file content.
+     * @throws Exception    If the operation failed.
      */
-    String finishChunkedUpload(String fileID, String eTag, String uploadID, int totalLength)
-            throws AeroFSException;
+    String finishChunkedUpload(String fileID, String eTag, String uploadID, long totalLength)
+            throws Exception;
 }
